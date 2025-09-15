@@ -1,13 +1,14 @@
+import { Link } from "react-router-dom";
 import { Home, Info, BookOpen, Phone } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   const navLinks = [
-    { name: "Home", href: "#home", icon: Home },
-    { name: "About", href: "#about", icon: Info },
-    { name: "Programs", href: "#programs", icon: BookOpen },
-    { name: "Contact", href: "#contact", icon: Phone },
+    { name: "Home", href: "/", icon: Home },
+    { name: "About", href: "/about", icon: Info },
+    { name: "Programs", href: "/programs", icon: BookOpen },
+    { name: "Contact", href: "/contact", icon: Phone },
   ];
 
   return (
@@ -24,13 +25,13 @@ const Footer = () => {
                 const Icon = link.icon;
                 return (
                   <li key={index}>
-                    <a 
-                      href={link.href} 
+                    <Link 
+                      to={link.href} 
                       className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors duration-300 group"
                     >
                       <Icon className="h-4 w-4 group-hover:text-primary transition-colors" />
                       <span>{link.name}</span>
-                    </a>
+                    </Link>
                   </li>
                 );
               })}

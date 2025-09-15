@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import brsLogo from "@/assets/brs-logo.png";
 
 const Hero = () => {
@@ -27,11 +28,12 @@ const Hero = () => {
             Where Future Innovators Begin – XR, Robotics, Coding & AI for Kids & Teens
           </p>
           <Button 
+            asChild
             variant="hero" 
             size="lg" 
             className="text-xl px-12 py-6 rounded-2xl font-black tracking-wide animate-scale-in delay-500"
           >
-            🚀 Enroll Now
+            <Link to="/enroll">🚀 Enroll Now</Link>
           </Button>
         </div>
       </div>

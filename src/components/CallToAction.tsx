@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Rocket, Sparkles } from "lucide-react";
 
 const CallToAction = () => {
@@ -29,19 +30,23 @@ const CallToAction = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
+              asChild
               variant="hero" 
               size="lg" 
               className="text-xl px-12 py-6 rounded-2xl font-black tracking-wide bg-white text-primary hover:bg-white/90 shadow-glow"
             >
-              <Sparkles className="h-6 w-6 mr-2" />
-              Enroll Now
+              <Link to="/enroll">
+                <Sparkles className="h-6 w-6 mr-2" />
+                Enroll Now
+              </Link>
             </Button>
             <Button 
+              asChild
               variant="outline" 
               size="lg" 
               className="text-xl px-8 py-6 rounded-2xl font-bold text-white border-white/30 hover:bg-white/10"
             >
-              Learn More
+              <Link to="/about">Learn More</Link>
             </Button>
           </div>
         </div>
