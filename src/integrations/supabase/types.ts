@@ -14,7 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      courses: {
+        Row: {
+          age_group: string
+          appointment_time: string | null
+          competition_date: string | null
+          competition_name: string | null
+          competition_prep: boolean | null
+          created_at: string
+          description: string | null
+          duration_weeks: number
+          end_date: string
+          enrolled_students: number
+          id: string
+          instructor_name: string | null
+          location: string | null
+          max_students: number
+          price: number | null
+          program_title: string
+          program_type: string
+          requirements: string[] | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          age_group: string
+          appointment_time?: string | null
+          competition_date?: string | null
+          competition_name?: string | null
+          competition_prep?: boolean | null
+          created_at?: string
+          description?: string | null
+          duration_weeks: number
+          end_date: string
+          enrolled_students?: number
+          id?: string
+          instructor_name?: string | null
+          location?: string | null
+          max_students?: number
+          price?: number | null
+          program_title: string
+          program_type: string
+          requirements?: string[] | null
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          age_group?: string
+          appointment_time?: string | null
+          competition_date?: string | null
+          competition_name?: string | null
+          competition_prep?: boolean | null
+          created_at?: string
+          description?: string | null
+          duration_weeks?: number
+          end_date?: string
+          enrolled_students?: number
+          id?: string
+          instructor_name?: string | null
+          location?: string | null
+          max_students?: number
+          price?: number | null
+          program_title?: string
+          program_type?: string
+          requirements?: string[] | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

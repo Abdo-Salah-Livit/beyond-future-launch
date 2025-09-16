@@ -1,6 +1,8 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import Schedule from "@/components/Schedule";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { Gamepad2, Bot, Code, Lightbulb, Clock, Users, Trophy, Star } from "lucide-react";
 
@@ -97,92 +99,115 @@ const ProgramsPage = () => {
         </div>
       </section>
 
-      {/* Programs Grid */}
+      {/* Main Content with Tabs */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16 animate-fade-in-up">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Choose Your <span className="bg-gradient-button bg-clip-text text-transparent">Adventure</span>
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Each program is carefully crafted to provide hands-on experience with cutting-edge technology
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
-            {programs.map((program, index) => {
-              const Icon = program.icon;
-              return (
-                <div 
-                  key={index}
-                  className="bg-card rounded-3xl p-8 shadow-card hover:shadow-glow transition-all duration-300 transform hover:scale-105 animate-fade-in-up border border-border/50"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="bg-gradient-button rounded-2xl p-4 w-16 h-16 flex items-center justify-center">
-                      <Icon className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="text-right">
-                      <div className="bg-primary/10 text-primary px-4 py-2 rounded-full font-bold text-lg">
-                        {program.price}
+          <Tabs defaultValue="programs" className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+                <TabsTrigger value="programs" className="text-lg">Program Overview</TabsTrigger>
+                <TabsTrigger value="schedule" className="text-lg">Course Schedule</TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="programs">
+              <div className="text-center mb-16 animate-fade-in-up">
+                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+                  Choose Your <span className="bg-gradient-button bg-clip-text text-transparent">Adventure</span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Each program is carefully crafted to provide hands-on experience with cutting-edge technology
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {programs.map((program, index) => {
+                  const Icon = program.icon;
+                  return (
+                    <div 
+                      key={index}
+                      className="bg-card rounded-3xl p-8 shadow-card hover:shadow-glow transition-all duration-300 transform hover:scale-105 animate-fade-in-up border border-border/50"
+                      style={{ animationDelay: `${index * 150}ms` }}
+                    >
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="bg-gradient-button rounded-2xl p-4 w-16 h-16 flex items-center justify-center">
+                          <Icon className="h-8 w-8 text-white" />
+                        </div>
+                        <div className="text-right">
+                          <div className="bg-primary/10 text-primary px-4 py-2 rounded-full font-bold text-lg">
+                            {program.price}
+                          </div>
+                        </div>
                       </div>
+                      
+                      <h3 className="text-2xl font-bold text-foreground mb-4">{program.title}</h3>
+                      <p className="text-muted-foreground mb-6 leading-relaxed">{program.description}</p>
+                      
+                      <div className="grid grid-cols-3 gap-4 mb-6">
+                        <div className="text-center">
+                          <Clock className="h-5 w-5 text-primary mx-auto mb-2" />
+                          <p className="text-sm font-semibold text-foreground">{program.duration}</p>
+                          <p className="text-xs text-muted-foreground">Duration</p>
+                        </div>
+                        <div className="text-center">
+                          <Users className="h-5 w-5 text-primary mx-auto mb-2" />
+                          <p className="text-sm font-semibold text-foreground">{program.students}</p>
+                          <p className="text-xs text-muted-foreground">Students</p>
+                        </div>
+                        <div className="text-center">
+                          <Trophy className="h-5 w-5 text-primary mx-auto mb-2" />
+                          <p className="text-sm font-semibold text-foreground">{program.level}</p>
+                          <p className="text-xs text-muted-foreground">Level</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-6">
+                        <h4 className="font-bold text-foreground mb-3">Skills You'll Learn:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {program.skills.map((skill, skillIndex) => (
+                            <span 
+                              key={skillIndex}
+                              className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="mb-8">
+                        <h4 className="font-bold text-foreground mb-3">Key Projects:</h4>
+                        <ul className="space-y-2">
+                          {program.projects.map((project, projectIndex) => (
+                            <li key={projectIndex} className="flex items-center text-muted-foreground">
+                              <Star className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                              {project}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <Button variant="hero" size="lg" className="w-full">
+                        <Link to="/enroll" className="w-full">Enroll Now</Link>
+                      </Button>
                     </div>
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold text-foreground mb-4">{program.title}</h3>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">{program.description}</p>
-                  
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="text-center">
-                      <Clock className="h-5 w-5 text-primary mx-auto mb-2" />
-                      <p className="text-sm font-semibold text-foreground">{program.duration}</p>
-                      <p className="text-xs text-muted-foreground">Duration</p>
-                    </div>
-                    <div className="text-center">
-                      <Users className="h-5 w-5 text-primary mx-auto mb-2" />
-                      <p className="text-sm font-semibold text-foreground">{program.students}</p>
-                      <p className="text-xs text-muted-foreground">Students</p>
-                    </div>
-                    <div className="text-center">
-                      <Trophy className="h-5 w-5 text-primary mx-auto mb-2" />
-                      <p className="text-sm font-semibold text-foreground">{program.level}</p>
-                      <p className="text-xs text-muted-foreground">Level</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <h4 className="font-bold text-foreground mb-3">Skills You'll Learn:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {program.skills.map((skill, skillIndex) => (
-                        <span 
-                          key={skillIndex}
-                          className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="mb-8">
-                    <h4 className="font-bold text-foreground mb-3">Key Projects:</h4>
-                    <ul className="space-y-2">
-                      {program.projects.map((project, projectIndex) => (
-                        <li key={projectIndex} className="flex items-center text-muted-foreground">
-                          <Star className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
-                          {project}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <Button variant="hero" size="lg" className="w-full">
-                    <Link to="/enroll" className="w-full">Enroll Now</Link>
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="schedule">
+              <div className="text-center mb-16 animate-fade-in-up">
+                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+                  Course <span className="bg-gradient-button bg-clip-text text-transparent">Schedule</span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Stay updated with our current and upcoming course schedules, including competition preparations
+                </p>
+              </div>
+              <Schedule />
+            </TabsContent>
+          </Tabs>
         </div>
       </section>
 
