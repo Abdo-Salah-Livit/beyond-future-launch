@@ -35,6 +35,14 @@ const Footer = () => {
                   </li>
                 );
               })}
+              <li>
+                <Link 
+                  to="/admin" 
+                  className="flex items-center space-x-2 text-white/40 hover:text-white/70 transition-colors duration-300 text-sm"
+                >
+                  <span>Admin</span>
+                </Link>
+              </li>
             </ul>
           </nav>
           
