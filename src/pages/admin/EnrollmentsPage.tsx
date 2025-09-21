@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Filter, Check, X, Eye, MoreHorizontal } from "lucide-react";
+import { enrollmentsApi, type Enrollment } from "@/lib/api";
+import { toast } from "sonner";
 
 // Mock enrollment data
 const enrollmentsData = [
@@ -85,22 +88,44 @@ const enrollmentsData = [
 ];
 
 export default function EnrollmentsPage() {
-  const [enrollments, setEnrollments] = useState(enrollmentsData);
   const [statusFilter, setStatusFilter] = useState("All");
   const [courseFilter, setCourseFilter] = useState("All");
+  const queryClient = useQueryClient();
 
-  const filteredEnrollments = enrollments.filter((enrollment) => {
-    const statusMatch = statusFilter === "All" || enrollment.status === statusFilter;
-    const courseMatch = courseFilter === "All" || enrollment.courseName === courseFilter;
-    return statusMatch && courseMatch;
+  const { data: enrollments = [], isLoading } = useQuery({
+    queryKey: ['enrollments'],
+    queryFn: enrollmentsApi.getAll,
   });
 
+  const updateEnrollmentMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Enrollment> }) =>
+      enrollmentsApi.update(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['enrollments'] });
+      toast.success('Enrollment updated successfully');
+    },
+    onError: () => {
+      toast.error('Failed to update enrollment');
+    },
+  });
+
+  const filteredEnrollments = enrollments.filter((enrollment) => {
+    if (statusFilter === "All") return true;
+    return enrollment.status === statusFilter;
+  });
+
+  const handleApprove = (enrollmentId: string) => {
+    updateEnrollmentMutation.mutate({
+      id: enrollmentId,
+      updates: { status: 'Active' }
+    });
+  };
+
   const updateEnrollmentStatus = (enrollmentId: string, newStatus: string) => {
-    setEnrollments(enrollments.map(enrollment => 
-      enrollment.id === enrollmentId 
-        ? { ...enrollment, status: newStatus }
-        : enrollment
-    ));
+    updateEnrollmentMutation.mutate({
+      id: enrollmentId,
+      updates: { status: newStatus as 'Pending' | 'Active' | 'Completed' }
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -250,7 +275,7 @@ export default function EnrollmentsPage() {
                         {enrollment.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium">{enrollment.price}</TableCell>
+                    <TableCell className="font-medium">N/A</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         {enrollment.status === "Pending" && (

@@ -1,80 +1,55 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Edit, Users, Calendar, Clock } from "lucide-react";
+import { coursesApi, type Course } from "@/lib/api";
+import { toast } from "sonner";
 
-// Mock course data
-const coursesData = [
-  {
-    id: "CRS001",
-    title: "Jr. Game Developer",
-    ageGroup: "10-12 Years",
-    levels: 3,
-    sessions: 12,
-    enrolled: 15,
-    maxCapacity: 20,
-    status: "Active",
-    startDate: "2024-02-01",
-    price: "$299",
-    description: "Introduction to game development using kid-friendly tools and engines.",
-    instructor: "Alex Thompson",
-  },
-  {
-    id: "CRS002",
-    title: "Robotics Explorer",
-    ageGroup: "8-10 Years", 
-    levels: 2,
-    sessions: 8,
-    enrolled: 12,
-    maxCapacity: 15,
-    status: "Active",
-    startDate: "2024-02-15",
-    price: "$249",
-    description: "Hands-on robotics programming with Arduino and sensors.",
-    instructor: "Sarah Chen",
-  },
-  {
-    id: "CRS003",
-    title: "AI Fundamentals",
-    ageGroup: "13-15 Years",
-    levels: 4,
-    sessions: 16,
-    enrolled: 8,
-    maxCapacity: 12,
-    status: "Active",
-    startDate: "2024-03-01",
-    price: "$399",
-    description: "Introduction to artificial intelligence and machine learning concepts.",
-    instructor: "Dr. Michael Brown",
-  },
-  {
-    id: "CRS004",
-    title: "XR Experience Design",
-    ageGroup: "14-16 Years",
-    levels: 3,
-    sessions: 10,
-    enrolled: 0,
-    maxCapacity: 10,
-    status: "Inactive",
-    startDate: "2024-04-01",
-    price: "$349",
-    description: "Create immersive VR and AR experiences using modern tools.",
-    instructor: "Emma Davis",
-  },
-];
+// Remove the mock data as we're now using the API
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState(coursesData);
+  const queryClient = useQueryClient();
+  
+  const { data: courses = [], isLoading } = useQuery({
+    queryKey: ['courses'],
+    queryFn: coursesApi.getAll,
+  });
 
-  const toggleCourseStatus = (courseId: string) => {
-    setCourses(courses.map(course => 
-      course.id === courseId 
-        ? { ...course, status: course.status === "Active" ? "Inactive" : "Active" }
-        : course
-    ));
+  const updateCourseMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Course> }) =>
+      coursesApi.update(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+      toast.success('Course updated successfully');
+    },
+    onError: () => {
+      toast.error('Failed to update course');
+    },
+  });
+
+  const toggleCourseStatus = (courseId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+    updateCourseMutation.mutate({
+      id: courseId,
+      updates: { status: newStatus as 'Active' | 'Inactive' }
+    });
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Course Management</h1>
+            <p className="text-muted-foreground mt-2">Loading courses...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -106,7 +81,8 @@ export default function CoursesPage() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     checked={course.status === "Active"}
-                    onCheckedChange={() => toggleCourseStatus(course.id)}
+                    onCheckedChange={() => toggleCourseStatus(course.id, course.status)}
+                    disabled={updateCourseMutation.isPending}
                   />
                   <span className="text-sm text-muted-foreground">
                     {course.status}

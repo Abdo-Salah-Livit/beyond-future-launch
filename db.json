@@ -1,0 +1,183 @@
+{
+  "students": [
+    {
+      "id": "STU001",
+      "name": "Alex Johnson",
+      "age": 12,
+      "email": "alex.johnson@email.com",
+      "enrolledCourses": ["CRS001", "CRS002"],
+      "joinDate": "2024-01-15",
+      "status": "Active"
+    },
+    {
+      "id": "STU002",
+      "name": "Sarah Chen",
+      "age": 14,
+      "email": "sarah.chen@email.com",
+      "enrolledCourses": ["CRS003", "CRS004"],
+      "joinDate": "2024-01-10",
+      "status": "Active"
+    },
+    {
+      "id": "STU003",
+      "name": "Michael Brown",
+      "age": 11,
+      "email": "michael.brown@email.com",
+      "enrolledCourses": ["CRS005"],
+      "joinDate": "2024-01-08",
+      "status": "Inactive"
+    },
+    {
+      "id": "STU004",
+      "name": "Emma Davis",
+      "age": 13,
+      "email": "emma.davis@email.com",
+      "enrolledCourses": ["CRS002", "CRS001"],
+      "joinDate": "2024-01-05",
+      "status": "Active"
+    },
+    {
+      "id": "STU005",
+      "name": "Liam Wilson",
+      "age": 10,
+      "email": "liam.wilson@email.com",
+      "enrolledCourses": ["CRS001"],
+      "joinDate": "2024-01-20",
+      "status": "Active"
+    }
+  ],
+  "courses": [
+    {
+      "id": "CRS001",
+      "title": "Jr. Game Developer",
+      "ageGroup": "10-12 Years",
+      "levels": 3,
+      "sessions": 12,
+      "enrolled": 15,
+      "maxCapacity": 20,
+      "status": "Active",
+      "startDate": "2024-02-01",
+      "price": "$299",
+      "description": "Introduction to game development using kid-friendly tools and engines.",
+      "instructor": "Alex Thompson"
+    },
+    {
+      "id": "CRS002",
+      "title": "Robotics Explorer",
+      "ageGroup": "8-10 Years",
+      "levels": 2,
+      "sessions": 8,
+      "enrolled": 12,
+      "maxCapacity": 15,
+      "status": "Active",
+      "startDate": "2024-02-15",
+      "price": "$249",
+      "description": "Hands-on robotics programming with Arduino and sensors.",
+      "instructor": "Sarah Chen"
+    },
+    {
+      "id": "CRS003",
+      "title": "AI Fundamentals",
+      "ageGroup": "13-15 Years",
+      "levels": 4,
+      "sessions": 16,
+      "enrolled": 8,
+      "maxCapacity": 12,
+      "status": "Active",
+      "startDate": "2024-03-01",
+      "price": "$399",
+      "description": "Introduction to artificial intelligence and machine learning concepts.",
+      "instructor": "Dr. Michael Brown"
+    },
+    {
+      "id": "CRS004",
+      "title": "XR Experience Design",
+      "ageGroup": "14-16 Years",
+      "levels": 3,
+      "sessions": 10,
+      "enrolled": 6,
+      "maxCapacity": 10,
+      "status": "Active",
+      "startDate": "2024-04-01",
+      "price": "$349",
+      "description": "Create immersive VR and AR experiences using modern tools.",
+      "instructor": "Emma Davis"
+    },
+    {
+      "id": "CRS005",
+      "title": "Python Programming Basics",
+      "ageGroup": "12-14 Years",
+      "levels": 2,
+      "sessions": 10,
+      "enrolled": 10,
+      "maxCapacity": 15,
+      "status": "Active",
+      "startDate": "2024-02-20",
+      "price": "$279",
+      "description": "Learn Python programming fundamentals through interactive projects.",
+      "instructor": "James Wilson"
+    }
+  ],
+  "enrollments": [
+    {
+      "id": "ENR001",
+      "studentId": "STU001",
+      "studentName": "Alex Johnson",
+      "courseId": "CRS001",
+      "courseName": "Jr. Game Developer",
+      "startDate": "2024-02-01",
+      "status": "Active",
+      "enrollmentDate": "2024-01-15"
+    },
+    {
+      "id": "ENR002",
+      "studentId": "STU001",
+      "studentName": "Alex Johnson",
+      "courseId": "CRS002",
+      "courseName": "Robotics Explorer",
+      "startDate": "2024-02-15",
+      "status": "Active",
+      "enrollmentDate": "2024-01-16"
+    },
+    {
+      "id": "ENR003",
+      "studentId": "STU002",
+      "studentName": "Sarah Chen",
+      "courseId": "CRS003",
+      "courseName": "AI Fundamentals",
+      "startDate": "2024-03-01",
+      "status": "Pending",
+      "enrollmentDate": "2024-01-18"
+    },
+    {
+      "id": "ENR004",
+      "studentId": "STU003",
+      "studentName": "Michael Brown",
+      "courseId": "CRS005",
+      "courseName": "Python Programming Basics",
+      "startDate": "2024-02-20",
+      "status": "Active",
+      "enrollmentDate": "2024-01-20"
+    },
+    {
+      "id": "ENR005",
+      "studentId": "STU004",
+      "studentName": "Emma Davis",
+      "courseId": "CRS001",
+      "courseName": "Jr. Game Developer",
+      "startDate": "2024-02-01",
+      "status": "Pending",
+      "enrollmentDate": "2024-01-22"
+    },
+    {
+      "id": "ENR006",
+      "studentId": "STU005",
+      "studentName": "Liam Wilson",
+      "courseId": "CRS001",
+      "courseName": "Jr. Game Developer",
+      "startDate": "2024-02-01",
+      "status": "Active",
+      "enrollmentDate": "2024-01-25"
+    }
+  ]
+}

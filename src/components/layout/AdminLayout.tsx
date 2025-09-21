@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Settings,
   Menu,
+  LogOut,
 } from "lucide-react";
 import {
   Sidebar,
@@ -21,8 +22,10 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { NavLink, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 const adminNavItems = [
   { title: "Dashboard", url: "/admin/dashboard", icon: Home },
@@ -74,20 +77,39 @@ function AdminSidebar() {
 }
 
 export default function AdminLayout() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background/95 to-primary/5">
         <AdminSidebar />
         
         <div className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center border-b border-border bg-card px-4">
-            <SidebarTrigger className="mr-4" />
-            <h1 className="text-lg font-semibold text-card-foreground">
-              Beyond Reality School - Admin Panel
-            </h1>
+          <header className="h-14 flex items-center justify-between border-b border-border bg-gradient-card px-4 shadow-sm">
+            <div className="flex items-center">
+              <SidebarTrigger className="mr-4" />
+              <h1 className="text-lg font-semibold text-card-foreground">
+                Beyond Reality School - Admin Panel
+              </h1>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleLogout}
+              className="gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
           </header>
           
-          <main className="flex-1 p-6 bg-muted/30">
+          <main className="flex-1 p-6 bg-muted/30 overflow-auto">
             <Outlet />
           </main>
         </div>

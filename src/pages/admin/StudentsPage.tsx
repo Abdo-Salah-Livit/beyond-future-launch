@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,47 +22,10 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Search, Plus, Eye, Edit, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { studentsApi, type Student } from "@/lib/api";
+import { toast } from "sonner";
 
-// Mock student data
-const studentsData = [
-  {
-    id: "STU001",
-    name: "Alex Johnson",
-    age: 12,
-    email: "alex.johnson@email.com",
-    enrolledCourses: ["Jr. Game Developer", "Robotics Basics"],
-    joinDate: "2024-01-15",
-    status: "Active",
-  },
-  {
-    id: "STU002", 
-    name: "Sarah Chen",
-    age: 14,
-    email: "sarah.chen@email.com",
-    enrolledCourses: ["AI Fundamentals", "Advanced Coding"],
-    joinDate: "2024-01-10",
-    status: "Active",
-  },
-  {
-    id: "STU003",
-    name: "Michael Brown",
-    age: 11,
-    email: "michael.brown@email.com",
-    enrolledCourses: ["XR Experience Design"],
-    joinDate: "2024-01-08",
-    status: "Inactive",
-  },
-  {
-    id: "STU004",
-    name: "Emma Davis",
-    age: 13,
-    email: "emma.davis@email.com",
-    enrolledCourses: ["Robotics Explorer", "Game Development"],
-    joinDate: "2024-01-05",
-    status: "Active",
-  },
-];
+// Remove the mock data as we're now using the API
 
 export default function StudentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,19 +35,63 @@ export default function StudentsPage() {
     age: "",
     email: "",
   });
+  
+  const queryClient = useQueryClient();
 
-  const filteredStudents = studentsData.filter(
+  const { data: students = [], isLoading } = useQuery({
+    queryKey: ['students'],
+    queryFn: studentsApi.getAll,
+  });
+
+  const createStudentMutation = useMutation({
+    mutationFn: studentsApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['students'] });
+      toast.success('Student added successfully');
+      setIsAddDialogOpen(false);
+      setNewStudent({ name: "", age: "", email: "" });
+    },
+    onError: () => {
+      toast.error('Failed to add student');
+    },
+  });
+
+  const filteredStudents = students.filter(
     (student) =>
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddStudent = () => {
-    // Mock add student functionality
-    console.log("Adding student:", newStudent);
-    setIsAddDialogOpen(false);
-    setNewStudent({ name: "", age: "", email: "" });
+    if (!newStudent.name || !newStudent.age || !newStudent.email) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    const studentData: Omit<Student, 'id'> = {
+      name: newStudent.name,
+      age: parseInt(newStudent.age),
+      email: newStudent.email,
+      enrolledCourses: [],
+      joinDate: new Date().toISOString().split('T')[0],
+      status: 'Active',
+    };
+
+    createStudentMutation.mutate(studentData);
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Student Management</h1>
+            <p className="text-muted-foreground mt-2">Loading students...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -144,8 +152,8 @@ export default function StudentsPage() {
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleAddStudent} className="bg-gradient-button">
-                Add Student
+              <Button onClick={handleAddStudent} className="bg-gradient-button" disabled={createStudentMutation.isPending}>
+                {createStudentMutation.isPending ? 'Adding...' : 'Add Student'}
               </Button>
             </div>
           </DialogContent>
@@ -189,9 +197,9 @@ export default function StudentsPage() {
                     <TableCell>{student.age} years</TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {student.enrolledCourses.map((course, index) => (
+                        {student.enrolledCourses.map((courseId, index) => (
                           <Badge key={index} variant="outline" className="text-xs">
-                            {course}
+                            {courseId}
                           </Badge>
                         ))}
                       </div>
