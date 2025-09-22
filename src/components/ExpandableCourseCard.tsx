@@ -1,0 +1,318 @@
+import { useState } from "react";
+import { Calendar, Clock, Users, MapPin, Trophy, DollarSign, Download, ChevronDown, ChevronUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { format } from "date-fns";
+import { Link } from "react-router-dom";
+import jsPDF from 'jspdf';
+
+interface Course {
+  id: string;
+  program_title: string;
+  program_type: string;
+  age_group: string;
+  start_date: string;
+  end_date: string;
+  duration_weeks: number;
+  max_students: number;
+  enrolled_students: number;
+  instructor_name: string;
+  appointment_time: string;
+  status: string;
+  price: number;
+  competition_prep: boolean;
+  competition_name?: string;
+  competition_date?: string;
+  location: string;
+  description: string;
+  requirements?: string[];
+}
+
+interface ExpandableCourseCardProps {
+  course: Course;
+  index: number;
+}
+
+const ExpandableCourseCard = ({ course, index }: ExpandableCourseCardProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const getSpotsRemaining = (course: Course) => {
+    return course.max_students - course.enrolled_students;
+  };
+
+  const getSpotsBadgeColor = (spotsRemaining: number) => {
+    if (spotsRemaining <= 2) return 'bg-red-500/10 text-red-600 border-red-200';
+    if (spotsRemaining <= 5) return 'bg-orange-500/10 text-orange-600 border-orange-200';
+    return 'bg-green-500/10 text-green-600 border-green-200';
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'upcoming': return 'bg-blue-500/10 text-blue-600 border-blue-200';
+      case 'ongoing': return 'bg-green-500/10 text-green-600 border-green-200';
+      case 'completed': return 'bg-gray-500/10 text-gray-600 border-gray-200';
+      default: return 'bg-gray-500/10 text-gray-600 border-gray-200';
+    }
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    let currentY = margin;
+
+    // Header
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    doc.text('BRS Course Information', margin, currentY);
+    currentY += 15;
+
+    // Course Title
+    doc.setFontSize(16);
+    doc.text(course.program_title, margin, currentY);
+    currentY += 10;
+
+    // Program Type
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Program Type: ${course.program_type}`, margin, currentY);
+    currentY += 8;
+
+    // Description
+    doc.text('Description:', margin, currentY);
+    currentY += 6;
+    const splitDescription = doc.splitTextToSize(course.description, pageWidth - 2 * margin);
+    doc.text(splitDescription, margin, currentY);
+    currentY += splitDescription.length * 5 + 10;
+
+    // Course Details
+    doc.setFont(undefined, 'bold');
+    doc.text('Course Details:', margin, currentY);
+    currentY += 8;
+
+    doc.setFont(undefined, 'normal');
+    const details = [
+      `Age Group: ${course.age_group}`,
+      `Duration: ${course.duration_weeks} weeks`,
+      `Start Date: ${format(new Date(course.start_date), 'MMM dd, yyyy')}`,
+      `End Date: ${format(new Date(course.end_date), 'MMM dd, yyyy')}`,
+      `Schedule: ${course.appointment_time}`,
+      `Location: ${course.location}`,
+      `Instructor: ${course.instructor_name}`,
+      `Class Size: ${course.enrolled_students}/${course.max_students} students`,
+      `Price: $${course.price}`,
+      `Status: ${course.status.charAt(0).toUpperCase() + course.status.slice(1)}`
+    ];
+
+    details.forEach(detail => {
+      doc.text(detail, margin, currentY);
+      currentY += 6;
+    });
+
+    // Requirements
+    if (course.requirements && course.requirements.length > 0) {
+      currentY += 5;
+      doc.setFont(undefined, 'bold');
+      doc.text('Requirements:', margin, currentY);
+      currentY += 8;
+
+      doc.setFont(undefined, 'normal');
+      course.requirements.forEach(req => {
+        doc.text(`• ${req}`, margin + 5, currentY);
+        currentY += 6;
+      });
+    }
+
+    // Competition Info
+    if (course.competition_prep && course.competition_name) {
+      currentY += 5;
+      doc.setFont(undefined, 'bold');
+      doc.text('Competition Preparation:', margin, currentY);
+      currentY += 8;
+
+      doc.setFont(undefined, 'normal');
+      doc.text(`Competition: ${course.competition_name}`, margin, currentY);
+      currentY += 6;
+
+      if (course.competition_date) {
+        doc.text(`Competition Date: ${format(new Date(course.competition_date), 'MMM dd, yyyy')}`, margin, currentY);
+        currentY += 6;
+      }
+    }
+
+    // Footer
+    currentY += 20;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'italic');
+    doc.text('For more information, visit our website or contact us directly.', margin, currentY);
+    doc.text('Generated by BRS Course Management System', margin, currentY + 8);
+
+    // Save the PDF
+    doc.save(`${course.program_title.replace(/\s+/g, '_')}_Course_Info.pdf`);
+  };
+
+  const spotsRemaining = getSpotsRemaining(course);
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Card 
+        className="border border-border/50 hover:shadow-glow transition-all duration-300 animate-fade-in-up overflow-hidden"
+        style={{ animationDelay: `${index * 150}ms` }}
+      >
+        <CollapsibleTrigger asChild>
+          <CardHeader className="cursor-pointer hover:bg-muted/20 transition-colors">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-1">
+                <CardTitle className="text-2xl font-bold text-foreground">{course.program_title}</CardTitle>
+                <p className="text-muted-foreground font-medium">{course.program_type}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge className={getStatusColor(course.status)}>
+                  {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
+                </Badge>
+                <Badge className={getSpotsBadgeColor(spotsRemaining)}>
+                  {spotsRemaining} spots left
+                </Badge>
+                {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-semibold">
+                {course.age_group}
+              </span>
+              <div className="flex items-center text-2xl font-bold text-green-600">
+                <DollarSign className="h-5 w-5 mr-1" />
+                {course.price}
+              </div>
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent>
+          <CardContent className="space-y-6 pt-0">
+            <p className="text-muted-foreground leading-relaxed">{course.description}</p>
+            
+            {/* Course Details Grid */}
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center">
+                <Calendar className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">Starts</p>
+                  <p className="text-muted-foreground">{format(new Date(course.start_date), 'MMM dd, yyyy')}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center">
+                <Calendar className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">Ends</p>
+                  <p className="text-muted-foreground">{format(new Date(course.end_date), 'MMM dd, yyyy')}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center">
+                <Clock className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">Duration</p>
+                  <p className="text-muted-foreground">{course.duration_weeks} weeks</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center">
+                <Users className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">Class Size</p>
+                  <p className="text-muted-foreground">{course.enrolled_students}/{course.max_students} students</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Additional Details */}
+            <div className="space-y-3 p-4 bg-muted/20 rounded-lg">
+              <div className="flex items-center text-sm">
+                <MapPin className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                <span><strong>Location:</strong> {course.location}</span>
+              </div>
+              <div className="flex items-center text-sm">
+                <Clock className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                <span><strong>Schedule:</strong> {course.appointment_time}</span>
+              </div>
+              <div className="flex items-center text-sm">
+                <Users className="h-4 w-4 text-primary mr-2 flex-shrink-0" />
+                <span><strong>Instructor:</strong> {course.instructor_name}</span>
+              </div>
+            </div>
+
+            {/* Requirements */}
+            {course.requirements && course.requirements.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-bold text-foreground">Requirements:</h4>
+                <ul className="space-y-2">
+                  {course.requirements.map((req, index) => (
+                    <li key={index} className="flex items-start text-sm text-muted-foreground">
+                      <div className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></div>
+                      {req}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Competition Info */}
+            {course.competition_prep && course.competition_name && (
+              <div className="bg-gradient-to-r from-primary/5 to-accent/5 p-4 rounded-lg border border-primary/20">
+                <div className="flex items-center mb-2">
+                  <Trophy className="h-5 w-5 text-primary mr-2" />
+                  <span className="font-bold text-primary">Competition Preparation Included</span>
+                </div>
+                <p className="text-sm text-foreground font-medium mb-1">{course.competition_name}</p>
+                {course.competition_date && (
+                  <p className="text-sm text-muted-foreground">
+                    Competition Date: {format(new Date(course.competition_date), 'MMM dd, yyyy')}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <Button 
+                asChild 
+                size="lg" 
+                className="flex-1 text-lg font-bold py-6 rounded-xl bg-gradient-button hover:opacity-90 text-white"
+                disabled={spotsRemaining <= 0}
+              >
+                {spotsRemaining > 0 ? (
+                  <Link to="/enroll">Enroll Now</Link>
+                ) : (
+                  <span>Course Full - Join Waitlist</span>
+                )}
+              </Button>
+
+              <Button 
+                onClick={generatePDF}
+                variant="outline" 
+                size="lg" 
+                className="px-6 py-6 rounded-xl font-bold"
+              >
+                <Download className="h-5 w-5 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+
+            {spotsRemaining <= 3 && spotsRemaining > 0 && (
+              <p className="text-center text-sm text-orange-600 font-semibold">
+                ⚡ Only {spotsRemaining} spots remaining!
+              </p>
+            )}
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
+  );
+};
+
+export default ExpandableCourseCard;
